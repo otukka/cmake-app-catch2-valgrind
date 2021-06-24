@@ -49,34 +49,30 @@ public:
     }
 
     // lvalue constructor
-    MyClass(const int &a_order, const int &a_data) : m_order(a_order), m_data(a_data),
-                                                     m_constructor(Constructor::lvalueParam)
+    MyClass(const int &a_order, const int &a_data) : m_order(a_order), m_data(a_data), m_constructor(Constructor::lvalueParam)
     {
         m_ptr = new int();
         *m_ptr = 0;
     }
 
     // rvalue constructor
-    MyClass(const int &&a_order, const int &&a_data) : m_order(a_order), m_data(a_data),
-                                                       m_constructor(Constructor::rvalueParam)
+    MyClass(const int &&a_order, const int &&a_data) : m_order(a_order), m_data(a_data), m_constructor(Constructor::rvalueParam)
     {
         m_ptr = new int();
         *m_ptr = 0;
     }
 
     // Copy constructor (lvalue)
-    MyClass(const MyClass &other) : m_order(other.m_order), m_data(other.m_data),
-                                    m_constructor(Constructor::Copy)
+    MyClass(const MyClass &other) : m_order(other.m_order), m_data(other.m_data), m_constructor(Constructor::Copy)
     {
         m_ptr = new int();
         *m_ptr = *other.m_ptr;
     }
 
     // Move constructor (rvalue)
-    MyClass(MyClass &&other) : m_order(std::move(other.m_order)), m_data(std::move(other.m_data)), m_constructor(Constructor::Move)
+    MyClass(MyClass &&other) noexcept : m_order(other.m_order), m_data(other.m_data), m_constructor(Constructor::Move)
     {
-        m_ptr = new int();
-        *m_ptr = *other.m_ptr;
+        m_ptr = other.m_ptr;
         other.m_data = FORGOTTEN_NUMBER;
         other.m_order = FORGOTTEN_NUMBER;
         other.m_ptr = nullptr;
@@ -91,11 +87,9 @@ public:
             // We replace existing object. Have to remove existing data.
             delete m_ptr;
             m_ptr = new int();
-
-            // Move data
-            *m_ptr = std::move(*other.m_ptr);
-            m_order = std::move(other.m_order);
-            m_data = std::move(other.m_data);
+            *m_ptr = *other.m_ptr;
+            m_order = other.m_order;
+            m_data = other.m_data;
             m_constructor = Constructor::CopyAssign;
         }
         return *this;
@@ -119,6 +113,7 @@ public:
             // Cleanup
             other.m_data = FORGOTTEN_NUMBER;
             other.m_order = FORGOTTEN_NUMBER;
+            delete other.m_ptr;
             other.m_ptr = nullptr;
             other.m_constructor = Constructor::Forgotten;
         }
@@ -279,10 +274,10 @@ void testLvalueConsturctor()
 // Move tests
 void testMoveConstructor1()
 {
-    MyClass tmp1 = MyClass();
-    assert(("Default true failed", tmp1.checkState({0, 0, 0, Constructor::Default})));
+    MyClass tmp1 = MyClass(1, 10);
+    assert(("Default true failed", tmp1.checkState({1, 10, 0, Constructor::rvalueParam})));
     MyClass tmp2 = std::move(tmp1);
-    assert(("Move true failed", tmp2.checkState({0, 0, 0, Constructor::Move})));
+    assert(("Move true failed", tmp2.checkState({1, 10, 0, Constructor::Move})));
     assert(tmp1.isFrogotten());
 }
 
@@ -308,7 +303,7 @@ void testMoveAssingConstructor()
 {
     MyClass tmp0 = MyClass();
     MyClass tmp1 = MyClass();
-    tmp0 = (MyClass&&)tmp1;
+    tmp0 = (MyClass &&) tmp1;
     assert(("Default true failed", tmp0.checkState({0, 0, 0, Constructor::MoveAssign})));
     assert(tmp1.isFrogotten());
 }
@@ -347,7 +342,6 @@ void testCopyAssingConstructor()
     assert(("Default true failed", tmp0.checkState({0, 0, 0, Constructor::CopyAssign})));
     assert(tmp1.isFrogotten());
 }
-
 
 void testCopyConstructor4()
 {
