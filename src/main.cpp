@@ -140,6 +140,17 @@ void test()
     assert(bitrangefloating((u32)5, (u32)3, (float)1.0) == -3.0);
     assert(bitrangefloating((u32)6, (u32)3, (float)1.0) == -2.0);
     assert(bitrangefloating((u32)7, (u32)3, (float)1.0) == -1.0);
+
+
+    assert(bitrangefloating((u32)0, (u32)3, (float)2.0) == 0.5 * 0.0);
+    assert(bitrangefloating((u32)1, (u32)3, (float)2.0) == 0.5 * 1.0);
+    assert(bitrangefloating((u32)2, (u32)3, (float)2.0) == 0.5 * 2.0);
+    assert(bitrangefloating((u32)3, (u32)3, (float)2.0) == 0.5 * 3.0);
+    assert(bitrangefloating((u32)4, (u32)3, (float)2.0) == 0.5 * -4.0);
+    assert(bitrangefloating((u32)5, (u32)3, (float)2.0) == 0.5 * -3.0);
+    assert(bitrangefloating((u32)6, (u32)3, (float)2.0) == 0.5 * -2.0);
+    assert(bitrangefloating((u32)7, (u32)3, (float)2.0) == 0.5 * -1.0);
+
 }
 
 int main(int argc, char const *argv[])
