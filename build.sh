@@ -8,8 +8,4 @@ else
     cd build
 fi
 
-
-
-
-
-make VERBOSE=1
+make VERBOSE=1 || exit 1
