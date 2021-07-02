@@ -6,9 +6,11 @@ project(app VERSION 1.0.0)
 
 add_executable(app)
 
+
 target_sources(
 app
 PRIVATE
 src/main.cpp
 )
 
+set_property(TARGET app PROPERTY CXX_STANDARD 17)
