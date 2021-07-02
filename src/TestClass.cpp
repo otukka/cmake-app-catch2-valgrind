@@ -4,6 +4,7 @@
 
 TestClass::TestClass(/* args */)
 {
+    m_ptr = new int();
 }
 
 TestClass::~TestClass()
