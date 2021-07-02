@@ -12,4 +12,4 @@ fi
 
 
 
-make VERBOSE=1 || exit 1
+make VERBOSE=1

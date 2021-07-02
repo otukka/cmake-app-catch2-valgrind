@@ -3,7 +3,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++ build active file",
-            "command": "/bin/bash",
+            "command": "/bin/sh",
             "args": [
                 "-c",
                 "${workspaceFolder}/build.sh"
