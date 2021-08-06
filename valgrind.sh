@@ -17,6 +17,10 @@ make || exit 1
 
 
 echo -e "\n-\n-"
+make test
+
+
+echo -e "\n-\n-"
 valgrind --leak-check=yes ./app
 
 
