@@ -2,53 +2,74 @@
 #include <iostream>
 #include <cstdint>   /* uintXX_t */
 #include <memory>    /* smart pointers */
-#include <algorithm> /* std::moves */
+#include <algorithm> /* std::move */
 #include "Container.hpp"
 
 void play_with_containers()
 {
-    Container container1;
-    // Container container2(); // Doesn't call constructor because "empty set of parenthesis is function declaration".
-    Container container3 = Container();
+
+    // Doesn't call constructor because "empty set of parenthesis is function declaration".
+    {
+        Container container2();
+    }
+
+    // Normal construction
+    {
+        Container container1;
+        Container container3 = Container();
+    }
+
+    {
+        std::shared_ptr<Subject> shared1 = std::make_shared<Subject>();
+        std::cout << "Sharer_ptr use count : " << shared1.use_count() << std::endl;
+        Container container1;
+        Container container2;
+        container1.SetSubject(shared1);
+        std::cout << "Sharer_ptr use count : " << shared1.use_count() << std::endl;
+        std::cout << "Sharer_ptr use count : " << container1.GetSubject().use_count() << std::endl;
+        container2.SetSubject(shared1);
+        std::cout << "Sharer_ptr use count : " << container1.GetSubject().use_count() << std::endl;
+    }
 }
 
 void play_with_smart_pointers()
 {
 
-    /* scope */
+    // Doesn't call constructor
     {
-        std::shared_ptr<Shared> shared1; // Doesn't call constructor
+        std::shared_ptr<Subject> shared1;
     }
 
+    // Doesn't call constructor
     {
-        std::shared_ptr<Shared> shared1(); // Doesn't call constructor
+        std::shared_ptr<Subject> shared1();
     }
 
+    // Works as expected
     {
-        Shared shared1;
-        std::shared_ptr<Shared> shared2 = std::make_shared<Shared>(shared1);
+        std::shared_ptr<Subject> shared1 = std::make_shared<Subject>();
+        std::shared_ptr<Subject> shared2 = std::make_shared<Subject>(24);
+    }
+
+    // DO NOT DO THIS WITH a shared_ptr
+    {
+        std::shared_ptr<Subject> shared1(new Subject());
+    }
+
+    // Copies existing to shared_ptr
+    {
+        Subject shared1;
+        std::shared_ptr<Subject> shared2 = std::make_shared<Subject>(shared1);
         shared1.SetData(13);
         shared2->SetData(31);
         std::cout << "Data shared1 : " << shared1.getData() << std::endl;
         std::cout << "Data shared2 : " << shared2->getData() << std::endl;
-
-
     }
 
-    /* Works as expected */
+    // Move a shared_ptr object to another Subject ptr
     {
-        std::shared_ptr<Shared> shared1 = std::make_shared<Shared>();
-        std::shared_ptr<Shared> shared2 = std::make_shared<Shared>(24);
-    }
-
-    /* Do not do this with shared ptr */
-    {
-        std::shared_ptr<Shared> shared1(new Shared());
-    }
-
-    {
-        std::shared_ptr<Shared> shared1 = std::make_shared<Shared>();
-        std::shared_ptr<Shared> shared2 = std::move(shared1); // Moves the whole shared_ptr object
+        std::shared_ptr<Subject> shared1 = std::make_shared<Subject>();
+        std::shared_ptr<Subject> shared2 = std::move(shared1);
 
         if (0) // this wouldn't work
         {
@@ -63,8 +84,8 @@ void play_with_smart_pointers()
     }
 
     {
-        std::shared_ptr<Shared> shared1 = std::make_shared<Shared>();
-        std::shared_ptr<Shared> shared2 = shared1;
+        std::shared_ptr<Subject> shared1 = std::make_shared<Subject>();
+        std::shared_ptr<Subject> shared2 = shared1;
         shared1->SetData(13);
         shared2->SetData(31);
         std::cout << "Data : " << shared1->getData() << std::endl;
@@ -75,8 +96,8 @@ void play_with_smart_pointers()
 int main(int argc, char const *argv[])
 {
     std::cout << "Program start ..." << std::endl;
-    play_with_smart_pointers();
-    // play_with_containers();
+    // play_with_smart_pointers();
+    play_with_containers();
     std::cout << "Program end ..." << std::endl;
     return 0;
 }

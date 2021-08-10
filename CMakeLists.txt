@@ -10,7 +10,7 @@ target_sources(app
 PRIVATE
     src/main.cpp
     src/Container.cpp
-    src/Shared.cpp
+    src/Subject.cpp
 )
 target_include_directories(app PRIVATE src)
 

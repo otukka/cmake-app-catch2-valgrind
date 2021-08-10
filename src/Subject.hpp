@@ -4,17 +4,17 @@
 
 #include <cstdint> /* uintXX_t */
 
-class Shared
+class Subject
 {
 private:
     uint32_t m_data;
 public:
-    Shared();
-    Shared(uint32_t a_data);
-    ~Shared();
+    Subject();
+    Subject(uint32_t a_data);
+    ~Subject();
     void SetData(uint32_t a_data);
     uint32_t getData();
 };
 
 
-#endif /*SHARED */
+#endif /*Subject */
