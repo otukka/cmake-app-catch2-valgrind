@@ -19,6 +19,7 @@ void play_with_containers()
         Container container3 = Container();
     }
 
+    // Use count calculation
     {
         std::shared_ptr<Subject> shared1 = std::make_shared<Subject>();
         std::cout << "Sharer_ptr use count : " << shared1.use_count() << std::endl;
@@ -26,7 +27,7 @@ void play_with_containers()
         Container container2;
         container1.SetSubject(shared1);
         std::cout << "Sharer_ptr use count : " << shared1.use_count() << std::endl;
-        std::cout << "Sharer_ptr use count : " << container1.GetSubject().use_count() << std::endl;
+        std::cout << "Sharer_ptr use count : " << container1.GetSubject().use_count() << std::endl; // extra count in return pointer
         container2.SetSubject(shared1);
         std::cout << "Sharer_ptr use count : " << container1.GetSubject().use_count() << std::endl;
     }
