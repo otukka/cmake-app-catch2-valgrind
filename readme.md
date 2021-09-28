@@ -1,3 +1,11 @@
-# Introduction
+# CMake-app-Catch2-Valgrind
 
-# Usage
+## Introduction
+Example project how to integrate CMake, Catch2 test framework, and Valgrind.
+
+## Requirements
+Install valgrind, cmake, and gcc
+
+## Usage
+Run the provided bash script. \
+```$ ./run.``` 
