@@ -17,8 +17,8 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
 tests/main.cpp
-tests/test_testclass.cpp
-src/TestClass.cpp
+tests/test_example_class.cpp
+src/ExampleClass.cpp
 )
 
 target_include_directories(tests PRIVATE src)
