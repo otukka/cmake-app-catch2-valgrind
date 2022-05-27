@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN   
+#define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
 
@@ -23,9 +23,22 @@
 #define BITMASK_CHECK_ALL(x, mask) (!(~(x) & (mask)))
 #define BITMASK_CHECK_ANY(x, mask) (!(!((x) & (mask))))
 
+TEST_CASE("Testing macros: check assumptions", "[assumptions]")
+{
+    CHECK(((!!0) == 0));
+    CHECK((((!(!(0)))) == 0));
+    for (uint8_t i = 1; i < UINT8_MAX; i++)
+    {
+        CHECK(((!!i) == 1));
+    }
 
-TEST_CASE( "Testing macro: bit operations", "[bitoper]" ) {
-    
+    CHECK(1);       // 1 = true
+    CHECK_FALSE(0); // 0 = false
+}
+
+TEST_CASE("Testing macros: bit: sequence", "[bit]")
+{
+
     uint8_t test;
 
     for (size_t i = 0; i < 7; i++)
@@ -34,76 +47,97 @@ TEST_CASE( "Testing macro: bit operations", "[bitoper]" ) {
         {
             uint8_t tmp = j; /* copy value because modification are inplace and loop might stuck */
             BIT_SET(tmp, i);
-            REQUIRE(BIT_CHECK(tmp, i));
+            CHECK(BIT_CHECK(tmp, i));
             BIT_CLEAR(tmp, i);
-            REQUIRE_FALSE(BIT_CHECK(tmp, i));
+            CHECK_FALSE(BIT_CHECK(tmp, i));
             BIT_FLIP(tmp, i);
-            REQUIRE(BIT_CHECK(tmp, i));
+            CHECK(BIT_CHECK(tmp, i));
             BIT_FLIP(tmp, i);
-            REQUIRE_FALSE(BIT_CHECK(tmp, i));
+            CHECK_FALSE(BIT_CHECK(tmp, i));
         }
     }
+}
+
+TEST_CASE("Testing macros: bitmask: sequence", "[bitmask]")
+{
+    uint8_t test;
 
     /* All same */
     for (uint8_t i = 0x01; i < 0xFF; i++)
     {
         uint8_t tmp = i;
-        
+
         BITMASK_SET(tmp, i);
-        REQUIRE(BITMASK_CHECK_ANY(tmp, i));
-        REQUIRE(BITMASK_CHECK_ALL(tmp, i));
+        CHECK(BITMASK_CHECK_ANY(tmp, i));
+        CHECK(BITMASK_CHECK_ALL(tmp, i));
 
         BITMASK_CLEAR(tmp, i);
-        REQUIRE(tmp ==  0x00);
+        CHECK(tmp == 0x00);
 
         BITMASK_SET(tmp, i);
         BITMASK_FLIP(tmp, i);
-        REQUIRE(tmp ==  0x00);
+        CHECK(tmp == 0x00);
 
         BITMASK_FLIP(tmp, i);
-        REQUIRE(BITMASK_CHECK_ANY(tmp, i));
-        REQUIRE(BITMASK_CHECK_ALL(tmp, i));
+        CHECK(BITMASK_CHECK_ANY(tmp, i));
+        CHECK(BITMASK_CHECK_ALL(tmp, i));
     }
+}
 
+TEST_CASE("Testing macros: bitmask: same to both fields", "[bitmask]")
+{
+    uint8_t test;
     /* All same */
     for (uint8_t i = 0x01; i < 0xFF; i++)
     {
-        REQUIRE(BITMASK_CHECK_ANY(i, i));
-        REQUIRE(BITMASK_CHECK_ALL(i, i));
+        CHECK(BITMASK_CHECK_ANY(i, i));
+        CHECK(BITMASK_CHECK_ALL(i, i));
         uint8_t copy = i;
-        REQUIRE_FALSE(BITMASK_CHECK_ANY((~copy), copy));
-        REQUIRE_FALSE(BITMASK_CHECK_ALL((~copy), copy));
+        CHECK_FALSE(BITMASK_CHECK_ANY((~copy), copy));
+        CHECK_FALSE(BITMASK_CHECK_ALL((~copy), copy));
     }
 
     /* All zeros */
     test = 0x00;
     for (uint8_t i = 0x01; i < 0xFF; i++)
     {
-        REQUIRE_FALSE(BITMASK_CHECK_ANY(test, i));
-        REQUIRE_FALSE(BITMASK_CHECK_ALL(test, i));
+        CHECK_FALSE(BITMASK_CHECK_ANY(test, i));
+        CHECK_FALSE(BITMASK_CHECK_ALL(test, i));
     }
+}
 
+TEST_CASE("Testing macros: bitmask: all ones", "[bitmask]")
+{
+    uint8_t test;
     /* All ones*/
     test = 0xFF;
     for (uint8_t i = 0x01; i < 0xFF; i++)
     {
-        REQUIRE(BITMASK_CHECK_ANY(test, i));
-        REQUIRE(BITMASK_CHECK_ALL(test, i));
+        CHECK(BITMASK_CHECK_ANY(test, i));
+        CHECK(BITMASK_CHECK_ALL(test, i));
     }
+}
 
+TEST_CASE("Testing macros: bitmask: first byte ones", "[bitmask]")
+{
+    uint8_t test;
     /* First byte ones*/
     test = 0xF0;
     for (uint8_t i = 0xF1; i < 0xFF; i++)
     {
-        REQUIRE_FALSE(BITMASK_CHECK_ALL(test, i));
-        REQUIRE(BITMASK_CHECK_ANY(test, i));
+        CHECK_FALSE(BITMASK_CHECK_ALL(test, i));
+        CHECK(BITMASK_CHECK_ANY(test, i));
     }
+}
 
+TEST_CASE("Testing macros: bitmask: second byte ones", "[bitmask]")
+{
+    uint8_t test;
     /* Second byte ones*/
     test = 0x0F;
     for (uint8_t i = 0xF1; i < 0xFF; i++)
     {
-        REQUIRE_FALSE(BITMASK_CHECK_ALL(test, i));
-        REQUIRE(BITMASK_CHECK_ANY(test, i));
+        CHECK_FALSE(BITMASK_CHECK_ALL(test, i));
+        CHECK(BITMASK_CHECK_ANY(test, i));
     }
 }

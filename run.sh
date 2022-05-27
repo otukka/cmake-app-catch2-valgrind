@@ -4,7 +4,7 @@
 if [[ ! -d "build" ]]; then
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    cmake -DCMAKE_BUILD_TYPE=Release ..
 else
     cd build
 fi
@@ -32,12 +32,14 @@ valgrind --leak-check=yes ./tests
 valgrindtest=$?
 
 
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NORMAL='\033[0m' # No Color
 
-echo -n "build:         " && if [ "$build" == 0 ];          then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
-echo -n "test:          " && if [ "$test" == 0 ];           then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
-echo -n "app:           " && if [ "$app" == 0 ];            then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
-echo -n "valgrind:      " && if [ "$valgrind" == 0 ];       then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
-echo -n "valgrindtest:  " && if [ "$valgrindtest" == 0 ];   then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
+echo -n "build              | " && if [ "$build" == 0 ];            then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
+echo -n "run: app           | " && if [ "$app" == 0 ];              then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
+echo -n "run: tests         | " && if [ "$test" == 0 ];             then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
+echo -n "valgrind: app      | " && if [ "$valgrind" == 0 ];         then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
+echo -n "valgrind: tests    | " && if [ "$valgrindtest" == 0 ];     then echo -e ${GREEN}"PASS"${NORMAL}; else echo -e ${RED}"FAIL"${NORMAL}; fi;
+

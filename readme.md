@@ -9,3 +9,6 @@ Install valgrind, cmake, and gcc
 ## Usage
 Run the provided bash script. \
 ```$ ./run.``` 
+
+## Clang-format/tidy
+Minimum version 13 required. 
