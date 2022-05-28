@@ -11,8 +11,9 @@ add_executable(app)
 
 target_sources(app PRIVATE
 src/main.cpp
+src/ringbuffer.c
 )
-target_include_directories(app PRIVATE src)
+target_include_directories(app PRIVATE src inc)
 
 target_compile_options(app PRIVATE -Wpedantic -Wextra -Werror)
 
@@ -21,10 +22,15 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
 tests/main.cpp
+tests/ringbuffer_tests.cpp
+src/ringbuffer.c
 )
 
-target_include_directories(tests PRIVATE src)
+target_include_directories(tests PRIVATE src inc)
 target_link_libraries(tests PRIVATE Catch2::Catch2)
+
+# Tests are designed with buffer length 10
+target_compile_definitions(tests PRIVATE RINGBUFFER_LENGTH=10)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Catch2/contrib/")
 
