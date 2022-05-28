@@ -6,38 +6,46 @@
 TEST_CASE("Size never too large")
 {
     ringbufferInit();
-    for (size_t i = 0; i < 1239; i++)
+    CHECK(isEmpty() == true);
+    for (size_t i = 0; i < 10000; i++)
     {
 
         addValue(i);
-        if (i > 10)
+        if (i >= (RINGBUFFER_LENGTH - 1))
         {
-            CHECK(getSize() == 10);
+            CHECK(getSize() == RINGBUFFER_LENGTH);
+            CHECK(isFull() == true);
         }
+        else
+        {
+            CHECK(isFull() == false);
+        }
+        INFO("Iteration: " << i);
+        CHECK(isValid() == true);
     }
 }
 
 TEST_CASE("Basic fill ringbuffer")
 {
     ringbufferInit();
-    for (size_t i = 0; i < 9; i++)
+    for (size_t i = 0; i < (RINGBUFFER_LENGTH - 1); i++)
     {
 
         addValue(i);
-
-        CHECK(getTail() == 0);
-        CHECK(getHead() == (i + 1));
+        INFO("Iteration: " << i);
+        CHECK(getStart() == 0);
+        CHECK(getEnd() == (i + 1));
         CHECK(getSize() == (i + 1));
     }
 
-    addValue(9);
+    addValue((RINGBUFFER_LENGTH - 1));
 
-    CHECK(getTail() == 0);
-    CHECK(getHead() == 0);
-    CHECK(getSize() == 10);
+    CHECK(getStart() == 0);
+    CHECK(getEnd() == 0);
+    CHECK(getSize() == RINGBUFFER_LENGTH);
 
-    uint32_t* buffer = getValues(10);
-    for (size_t i = 0; i < 10; i++)
+    uint32_t* buffer = getValues(RINGBUFFER_LENGTH);
+    for (size_t i = 0; i < RINGBUFFER_LENGTH; i++)
     {
         CHECK(buffer[i] == i);
     }
@@ -46,42 +54,95 @@ TEST_CASE("Basic fill ringbuffer")
 TEST_CASE("More complex fill ringbuffer")
 {
     ringbufferInit();
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < RINGBUFFER_LENGTH; i++)
     {
         addValue(i);
     }
 
-    uint32_t* buffer = getValues(5);
-    for (size_t i = 0; i < 5; i++)
+    uint32_t* buffer = getValues((RINGBUFFER_LENGTH / 2));
+    for (size_t i = 0; i < (RINGBUFFER_LENGTH / 2); i++)
     {
         CHECK(buffer[i] == i);
     }
 
-    CHECK(getTail() == 5);
-    CHECK(getHead() == 0);
+    CHECK(getStart() == (RINGBUFFER_LENGTH / 2));
+    CHECK(getEnd() == 0);
 
-    for (size_t i = 0; i < 5; i++)
+    for (size_t i = 0; i < (RINGBUFFER_LENGTH / 2); i++)
     {
         addValue(i);
     }
 
-    CHECK(getTail() == 5);
-    CHECK(getHead() == 5);
-    CHECK(getSize() == 10);
+    CHECK(getStart() == (RINGBUFFER_LENGTH / 2));
+    CHECK(getEnd() == (RINGBUFFER_LENGTH / 2));
+    CHECK(getSize() == RINGBUFFER_LENGTH);
 
-
-    for (size_t i = 0; i < 5; i++)
+    for (size_t i = 0; i < (RINGBUFFER_LENGTH / 2); i++)
     {
         addValue(i);
     }
 
-    CHECK(getTail() == 0);
-    CHECK(getHead() == 0);
-    CHECK(getSize() == 10);
-
+    CHECK(getStart() == 0);
+    CHECK(getEnd() == 0);
+    CHECK(getSize() == RINGBUFFER_LENGTH);
 
     buffer = getValues(1);
-    CHECK(getTail() == 1);
-    CHECK(getHead() == 0);
-    CHECK(getSize() == 9);
+    CHECK(getStart() == 1);
+    CHECK(getEnd() == 0);
+    CHECK(getSize() == (RINGBUFFER_LENGTH - 1));
+}
+
+TEST_CASE("Read at center")
+{
+    ringbufferInit();
+    for (size_t i = 0; i < RINGBUFFER_LENGTH; i++)
+    {
+        addValue(i);
+    }
+
+    CHECK(getStart() == 0);
+    CHECK(getEnd() == 0);
+
+    uint32_t* buffer = getValues((RINGBUFFER_LENGTH / 2));
+    for (size_t i = 0; i < (RINGBUFFER_LENGTH / 2); i++)
+    {
+        CHECK(buffer[i] == i);
+    }
+
+    CHECK(getStart() == (RINGBUFFER_LENGTH / 2));
+    CHECK(getEnd() == 0);
+
+    for (size_t i = RINGBUFFER_LENGTH; i < (RINGBUFFER_LENGTH * 3 / 2); i++)
+    {
+        addValue(i);
+    }
+
+    CHECK(getStart() == (RINGBUFFER_LENGTH / 2));
+    CHECK(getEnd() == (RINGBUFFER_LENGTH / 2));
+
+    buffer = getValues(RINGBUFFER_LENGTH);
+
+    CHECK(getStart() == (RINGBUFFER_LENGTH / 2));
+    CHECK(getEnd() == (RINGBUFFER_LENGTH / 2));
+
+    for (size_t i = RINGBUFFER_LENGTH; i < (RINGBUFFER_LENGTH * 2); i++)
+    {
+        CHECK(buffer[i - RINGBUFFER_LENGTH] == i - (RINGBUFFER_LENGTH / 2));
+    }
+}
+
+TEST_CASE("Fill empty one by one")
+{
+    ringbufferInit();
+    for (size_t i = 0; i < RINGBUFFER_LENGTH; i++)
+    {
+        addValue(i);
+    }
+
+    for (size_t i = 0; i < RINGBUFFER_LENGTH; i++)
+    {
+        CHECK(getStart() == i);
+        uint32_t* buffer = getValues(1);
+        CHECK(buffer[0] == i);
+    }
 }

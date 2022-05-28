@@ -29,8 +29,8 @@ src/ringbuffer.c
 target_include_directories(tests PRIVATE src inc)
 target_link_libraries(tests PRIVATE Catch2::Catch2)
 
-# Tests are designed with buffer length 10
-target_compile_definitions(tests PRIVATE RINGBUFFER_LENGTH=10)
+# Tests are designed with buffer length is power of two
+target_compile_definitions(tests PRIVATE RINGBUFFER_LENGTH=16)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Catch2/contrib/")
 

@@ -4,49 +4,64 @@
 
 static ringbuffer_t m_ringbuffer;
 
+static uint32_t returnBuffer[RINGBUFFER_LENGTH] = { 0 };
+
 void ringbufferInit(void)
 {
     memset(&m_ringbuffer, 0x00, sizeof(ringbuffer_t));
+    memset(&returnBuffer, 0x00, sizeof(returnBuffer));
 }
 
 void addValue(uint32_t a_value)
 {
-    m_ringbuffer.buffer[m_ringbuffer.head % RINGBUFFER_LENGTH] = a_value;
-    if (getSize() % (RINGBUFFER_LENGTH + 1) == RINGBUFFER_LENGTH)
+    m_ringbuffer.buffer[m_ringbuffer.end & (RINGBUFFER_LENGTH - 1)] = a_value;
+    if (isFull())
     {
-        m_ringbuffer.tail++;
+        m_ringbuffer.start &= ((RINGBUFFER_LENGTH * 2) - 1);
+        m_ringbuffer.start++;
     }
-    m_ringbuffer.head++;
+    m_ringbuffer.end &= ((RINGBUFFER_LENGTH * 2) - 1);
+    m_ringbuffer.end++;
 }
 
 uint32_t* getValues(uint32_t a_length)
 {
-    uint32_t* ptr = &m_ringbuffer.buffer[m_ringbuffer.tail % RINGBUFFER_LENGTH];
-    m_ringbuffer.tail += a_length;
-    return ptr;
+    for (size_t i = 0; i < a_length; i++)
+    {
+        returnBuffer[i] = m_ringbuffer.buffer[m_ringbuffer.start & (RINGBUFFER_LENGTH - 1)];
+        m_ringbuffer.start &= ((RINGBUFFER_LENGTH * 2) - 1);
+        m_ringbuffer.start++;
+    }
+    return &returnBuffer[0];
 }
 
-uint32_t getHead(void)
+uint32_t getEnd(void)
 {
-    return m_ringbuffer.head % RINGBUFFER_LENGTH;
+    return m_ringbuffer.end & (RINGBUFFER_LENGTH - 1);
 }
 
-uint32_t getTail(void)
+uint32_t getStart(void)
 {
-    return m_ringbuffer.tail % RINGBUFFER_LENGTH;
+    return m_ringbuffer.start & (RINGBUFFER_LENGTH - 1);
 }
 
-uint32_t getHeadRaw(void)
+bool isEmpty(void)
 {
-    return m_ringbuffer.head;
+    return (m_ringbuffer.start == m_ringbuffer.end) ? true : false;
 }
 
-uint32_t getTailRaw(void)
+bool isFull(void)
 {
-    return m_ringbuffer.tail;
+    return (getSize() == RINGBUFFER_LENGTH) ? true : false;
 }
 
 uint32_t getSize(void)
 {
-    return (m_ringbuffer.head - m_ringbuffer.tail);
+    return (((m_ringbuffer.end) - (m_ringbuffer.start)) & ((RINGBUFFER_LENGTH * 2) - 1));
+}
+
+bool isValid(void)
+{
+    return ((m_ringbuffer.end > (RINGBUFFER_LENGTH * 2)) || (m_ringbuffer.start > (RINGBUFFER_LENGTH * 2))) ? false
+                                                                                                            : true;
 }

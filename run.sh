@@ -9,13 +9,25 @@ else
     cd build
 fi
 
+if [[ $1 == "VERBOSE" ]]; then
+VERBOSE="VERBOSE=1"
+fi
+
 # Build the app
-make VERBOSE=1
+make $VERBOSE
 build=$?
 
+if [ "$build" != 0 ]; then
+    exit 1
+fi
+
 # Build the tests
-make test VERBOSE=1
+make test $VERBOSE
 test=$?
+
+if [ "$test" != 0 ]; then
+    exit 1
+fi
 
 # Run the app
 ./app
