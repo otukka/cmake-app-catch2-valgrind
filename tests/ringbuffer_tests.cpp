@@ -3,6 +3,44 @@
 
 #include "ringbuffer.h"
 
+TEST_CASE("Distinguish empty and full")
+{
+    ringbufferInit();
+    CHECK(isEmpty() == true);
+    CHECK(isFull() == false);
+    for (size_t i = 0; i < RINGBUFFER_LENGTH - 1; i++)
+    {
+        addValue(i);
+        CHECK(isFull() == false);
+        CHECK(isEmpty() == false);
+    }
+
+    for (size_t i = 0; i < RINGBUFFER_LENGTH * 10; i++)
+    {
+        addValue(i);
+        CHECK(isFull() == true);
+        CHECK(isEmpty() == false);
+    }
+}
+
+TEST_CASE("Fill to full then empty")
+{
+    ringbufferInit();
+ 
+    CHECK(isEmpty() == true);
+    CHECK(isFull() == false);
+
+    for (size_t i = 0; i < RINGBUFFER_LENGTH; i++)
+    {
+        addValue(i);
+    }
+
+    uint32_t* buffer = getValues(RINGBUFFER_LENGTH);
+
+    CHECK(isEmpty() == true);
+    CHECK(isFull() == false);
+}
+
 TEST_CASE("Size never too large")
 {
     ringbufferInit();
